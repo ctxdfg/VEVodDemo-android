@@ -17,14 +17,19 @@
  */
 package com.bytedance.volc.voddemo.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import com.bytedance.volc.voddemo.data.remote.Response;
 
 @Entity(tableName = "video_item")
-public class VideoItem {
+public class VideoItem implements Parcelable {
     public static final int VIDEO_TYPE_SMALL = 0;
+    public static final int VIDEO_TYPE_LONG = 1;
 
     @NonNull
     @PrimaryKey
@@ -54,6 +59,44 @@ public class VideoItem {
         this.type = type;
         this.itemId = String.format("%s_%d", vid, type);
     }
+
+    protected VideoItem(Parcel in) {
+        itemId = in.readString();
+        vid = in.readString();
+        duration = in.readInt();
+        title = in.readString();
+        cover = in.readString();
+        authToken = in.readString();
+        type = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(itemId);
+        dest.writeString(vid);
+        dest.writeInt(duration);
+        dest.writeString(title);
+        dest.writeString(cover);
+        dest.writeString(authToken);
+        dest.writeInt(type);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<VideoItem> CREATOR = new Creator<VideoItem>() {
+        @Override
+        public VideoItem createFromParcel(Parcel in) {
+            return new VideoItem(in);
+        }
+
+        @Override
+        public VideoItem[] newArray(int size) {
+            return new VideoItem[size];
+        }
+    };
 
     @NonNull
     public String getItemId() {
@@ -121,6 +164,14 @@ public class VideoItem {
         return new VideoItem(videoDetail.getVid(), (int) (videoDetail.getDuration() * 1000),
                 videoDetail.getCaption(), videoDetail.getCoverUrl(), videoDetail.getPlayAuthToken()
                 , VIDEO_TYPE_SMALL);
+    }
+
+    public static boolean isSameVideo(VideoItem a, VideoItem b) {
+        if (a == null && b == null) return true;
+        if (a == b) return true;
+        if (a.equals(b)) return true;
+        if (TextUtils.equals(a.vid, b.vid)) return true;
+        return false;
     }
 }
 

@@ -24,7 +24,6 @@ import com.bytedance.volc.voddemo.BuildConfig;
 import com.bytedance.volc.voddemo.VodApp;
 import com.bytedance.volc.voddemo.data.VideoItem;
 import com.bytedance.volc.voddemo.preload.PreloadManager;
-import com.bytedance.volc.voddemo.preload.PreloadStrategy;
 import com.bytedance.volc.voddemo.settings.ClientSettings;
 import com.ss.ttvideoengine.DataLoaderHelper;
 import com.ss.ttvideoengine.SeekCompletionListener;
@@ -47,12 +46,14 @@ public class VOLCVideoController implements VideoController, VideoInfoListener {
     private final ClientSettings mSettings = VodApp.getClientSettings();
     private final Context mContext;
     private final VideoItem mVideoItem;
-    private final VideoPlayListener mVideoPlayListener;
+    private VideoPlayListener mVideoPlayListener;
     private TTVideoEngine mVideoEngine;
     private Surface mSurface;
 
     private boolean mPrepared;
     private boolean mPlayAfterSurfaceValid;
+
+    private long mStartTime;
 
     private final SeekCompletionListener mSeekCompletionListener = new SeekCompletionListener() {
         @Override
@@ -170,10 +171,13 @@ public class VOLCVideoController implements VideoController, VideoInfoListener {
         }
     };
 
-    public VOLCVideoController(@NonNull Context context, @NonNull VideoItem mVideoItem,
-            VideoPlayListener listener) {
+    public VOLCVideoController(@NonNull Context context, @NonNull VideoItem mVideoItem) {
         this.mContext = context;
         this.mVideoItem = mVideoItem;
+    }
+
+    @Override
+    public void setVideoPlayListener(VideoPlayListener listener) {
         this.mVideoPlayListener = listener;
     }
 
@@ -208,12 +212,14 @@ public class VOLCVideoController implements VideoController, VideoInfoListener {
             // enable key message upload：default is enable
             mVideoEngine.setReportLogEnable(mSettings.engineEnableUploadLog());
             DataLoaderHelper.getDataLoader().setReportLogEnable(mSettings.mdlEnableUploadLog());
-            // set resolution
-            mVideoEngine.configResolution(PreloadStrategy.START_PLAY_RESOLUTION);
 
             // VOD key step play 4: set source
             mVideoEngine.setVideoID(mVideoItem.getVid());
             mVideoEngine.setPlayAuthToken(mVideoItem.getAuthToken());
+
+            if (mStartTime >= 0) {
+                mVideoEngine.setStartTime((int) mStartTime);
+            }
 
             if (mVideoPlayListener != null) {
                 mVideoPlayListener.onCallPlay();
@@ -268,6 +274,11 @@ public class VOLCVideoController implements VideoController, VideoInfoListener {
     }
 
     @Override
+    public boolean isPrepared() {
+        return mPrepared;
+    }
+
+    @Override
     public boolean isPlaying() {
         return mPrepared && mVideoEngine.getPlaybackState() == TTVideoEngine.PLAYBACK_STATE_PLAYING;
     }
@@ -287,8 +298,12 @@ public class VOLCVideoController implements VideoController, VideoInfoListener {
 
     @Override
     public String getCover() {
-
         return mVideoItem.getCover();
+    }
+
+    @Override
+    public String getTitle() {
+        return mVideoItem.getTitle();
     }
 
     @Override
@@ -315,6 +330,11 @@ public class VOLCVideoController implements VideoController, VideoInfoListener {
         return mVideoEngine.getCurrentPlaybackTime();
     }
 
+    @Override
+    public VideoItem getVideoItem() {
+        return mVideoItem;
+    }
+
     public void setSurface(Surface surface) {
         mSurface = surface;
         if (mSurface == null || !mSurface.isValid()) {
@@ -329,6 +349,11 @@ public class VOLCVideoController implements VideoController, VideoInfoListener {
                 mPlayAfterSurfaceValid = false;
             }
         }
+    }
+
+    @Override
+    public void setStartTime(long startTime) {
+        this.mStartTime = startTime;
     }
 
     public TTVideoEngine getTTVideoEngine() {
@@ -367,6 +392,7 @@ public class VOLCVideoController implements VideoController, VideoInfoListener {
             mVideoPlayListener.onVideoSeekStart(msec);
         }
     }
+
 
     private void onSeekComplete(final boolean success) {
         TTVideoEngineLog.d(TAG, "seek_complete:" + (success ? "done" : "fail"));

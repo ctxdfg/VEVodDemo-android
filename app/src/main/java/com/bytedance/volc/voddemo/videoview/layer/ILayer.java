@@ -21,11 +21,14 @@ import android.content.Context;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import java.util.List;
 
 public interface ILayer extends Comparable<ILayer> {
+
+    int FORE_PLAY_Z_INDEX = 200;
 
     int VIDEO_COVER_Z_INDEX = 300;
 
@@ -33,12 +36,20 @@ public interface ILayer extends Comparable<ILayer> {
 
     int SMALL_TOOLBAR_Z_INDEX = 600;
 
+    int TOOLBAR_Z_INDEX = 700;
+
+    int PIP_PROGRESS_Z_INDEX = 701;
+
+    int PIP_ACTION_Z_INDEX = 702;
+
     int LOAD_FAIL_Z_INDEX = 1200;
 
     int DEBUG_TOOL_Z_INDEX = 1400;
 
-    Pair<View, RelativeLayout.LayoutParams> onCreateView(@NonNull Context context, @NonNull
-            LayoutInflater inflater);
+    int PIP_CLOSE_Z_INDEX = 2000;
+
+    View onCreateView(@NonNull Context context, @NonNull
+            LayoutInflater inflater, RelativeLayout parent);
 
     @NonNull
     List<Integer> getSupportEvents();

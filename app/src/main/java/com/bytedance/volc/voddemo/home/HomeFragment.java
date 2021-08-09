@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,12 +39,12 @@ import com.bytedance.volc.voddemo.utils.WeakHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bytedance.volc.voddemo.data.VideoItem.VIDEO_TYPE_LONG;
 import static com.bytedance.volc.voddemo.data.VideoItem.VIDEO_TYPE_SMALL;
 
 public class HomeFragment extends Fragment {
 
     private static final int ITEM_CLICK = 0;
-    private static final int SMALL = 0;
     private static final int GRID_DEFAULT_SPAN_COUNT = 2;
 
     private boolean mClickable = true;
@@ -79,48 +78,51 @@ public class HomeFragment extends Fragment {
                         layoutManager.getSpanCount()));
 
         List<ActionHolder> holders = new ArrayList<>();
-        holders.add(new ActionHolder(R.string.small_video, R.drawable.ic_small_video, SMALL));
+        holders.add(new ActionHolder(R.string.small_video, R.drawable.ic_small_video,
+                VIDEO_TYPE_SMALL));
+        holders.add(new ActionHolder(R.string.long_video, R.drawable.ic_long_video,
+                VIDEO_TYPE_LONG));
+
         BaseAdapter<ActionHolder> adapter = new BaseAdapter<ActionHolder>(holders) {
 
+            @NonNull
             @Override
-            public int getLayoutId(final int viewType) {
-                return R.layout.list_item_fragment_home;
-            }
-
-            @SuppressLint("UseCompatLoadingForDrawables")
-            @Override
-            public void onBindViewHolder(final ViewHolder holder, final ActionHolder data,
-                    final int position) {
-                TextView tvTitle = holder.getView(R.id.tvTitle);
-                tvTitle.setText(getString(data.name));
-                ImageView imageView = holder.getView(R.id.imageIcon);
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    imageView.setImageDrawable(
-                            getResources().getDrawable(data.drawable, requireContext().getTheme()));
-                } else {
-                    imageView.setImageDrawable(getResources().getDrawable(data.drawable));
-                }
-
-                holder.getView(R.id.card).setOnClickListener(v -> {
-                    mWeakHandler.sendMessageDelayed(mWeakHandler.obtainMessage(ITEM_CLICK),
-                            1000);
-                    if (mClickable) {
-                        mClickable = false;
-                        switch (data.action) {
-                            case SMALL:
-                                ShellActivity.startNewIntent(getActivity(), VIDEO_TYPE_SMALL);
-                                break;
-                            default:
-                                String msg = getString(R.string.not_implementation);
-                                Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-                                mClickable = false;
-                                break;
-                        }
-                    }
-                });
+            public ViewHolder<ActionHolder> onCreateViewHolder(@NonNull final ViewGroup parent,
+                    final int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.list_item_fragment_home, parent, false);
+                return new HomeViewHolder(view);
             }
         };
         recyclerView.setAdapter(adapter);
+    }
+
+    private class HomeViewHolder extends BaseAdapter.ViewHolder<ActionHolder> {
+        public HomeViewHolder(@NonNull final View itemView) {
+            super(itemView);
+        }
+
+        @SuppressLint("UseCompatLoadingForDrawables")
+        @Override
+        public void setupViews(final int position, final ActionHolder data) {
+            TextView tvTitle = (TextView) getView(R.id.tvTitle);
+            tvTitle.setText(getString(data.name));
+            ImageView imageView = (ImageView) getView(R.id.imageIcon);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                imageView.setImageDrawable(
+                        getResources().getDrawable(data.drawable, requireContext().getTheme()));
+            } else {
+                imageView.setImageDrawable(getResources().getDrawable(data.drawable));
+            }
+
+            getView(R.id.card).setOnClickListener(v -> {
+                mWeakHandler.sendMessageDelayed(mWeakHandler.obtainMessage(ITEM_CLICK), 1000);
+                if (mClickable) {
+                    mClickable = false;
+                    ShellActivity.startNewIntent(getActivity(), data.action);
+                }
+            });
+        }
     }
 
     static class ActionHolder {

@@ -17,20 +17,29 @@
  */
 package com.bytedance.volc.voddemo.settings;
 
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SwitchCompat;
 import com.bytedance.volc.voddemo.R;
 import com.bytedance.volc.voddemo.base.BaseAdapter;
-import com.ss.ttvideoengine.utils.TTVideoEngineLog;
 import java.util.List;
-
-import static com.bytedance.volc.voddemo.settings.SettingItem.BOOL_VIEW_TYPE;
-import static com.bytedance.volc.voddemo.settings.SettingItem.BUTTON_VIEW_TYPE;
 
 public class SettingAdapter extends BaseAdapter<SettingItem> {
 
     public SettingAdapter(final List<SettingItem> datas) {
         super(datas);
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder<SettingItem> onCreateViewHolder(@NonNull final ViewGroup parent,
+            final int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.list_item_setting_bool, parent, false);
+        return new BoolSettingViewHolder(view);
     }
 
     @Override
@@ -39,25 +48,16 @@ public class SettingAdapter extends BaseAdapter<SettingItem> {
         return item.getType();
     }
 
-    @Override
-    public int getLayoutId(final int viewType) {
-        if (viewType == BOOL_VIEW_TYPE) {
-            return R.layout.list_item_setting_bool;
-        } else if (viewType == BUTTON_VIEW_TYPE) {
-            return R.layout.list_item_setting_button;
+    private static class BoolSettingViewHolder extends ViewHolder<SettingItem> {
+        public BoolSettingViewHolder(@NonNull final View itemView) {
+            super(itemView);
         }
 
-        return R.layout.list_item_setting_title;
-    }
-
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, final SettingItem data,
-            final int position) {
-
-        if (data instanceof BoolSettingItem) {
+        @Override
+        public void setupViews(final int position, final SettingItem data) {
             BoolSettingItem settingItem = (BoolSettingItem) data;
-            ((TextView) holder.getView(R.id.txt_test_text)).setText(settingItem.getText());
-            SwitchCompat switchCompat = holder.getView(R.id.test_switcher);
+            ((TextView) getView(R.id.txt_test_text)).setText(settingItem.getText());
+            SwitchCompat switchCompat = (SwitchCompat) getView(R.id.test_switcher);
             switchCompat.setEnabled(settingItem.isEnable());
             switchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 settingItem.setDefaultValue(isChecked);

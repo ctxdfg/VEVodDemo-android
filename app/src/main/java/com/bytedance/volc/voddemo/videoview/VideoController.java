@@ -18,12 +18,17 @@
 package com.bytedance.volc.voddemo.videoview;
 
 import android.view.Surface;
+import com.bytedance.volc.voddemo.data.VideoItem;
 
 public interface VideoController {
+
+    void setVideoPlayListener(VideoPlayListener listener);
 
     int getDuration();
 
     void setSurface(Surface surface);
+
+    void setStartTime(long startTime);
 
     void pause();
 
@@ -33,6 +38,8 @@ public interface VideoController {
 
     void seekTo(int msec);
 
+    boolean isPrepared();
+
     boolean isPlaying();
 
     boolean isPaused();
@@ -41,9 +48,13 @@ public interface VideoController {
 
     String getCover();
 
+    String getTitle();
+
     int getVideoWidth();
 
     int getVideoHeight();
 
     int getCurrentPlaybackTime();
+
+    VideoItem getVideoItem();
 }

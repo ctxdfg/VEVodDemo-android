@@ -18,20 +18,22 @@
 package com.bytedance.volc.voddemo.data.remote;
 
 import com.bytedance.volc.voddemo.data.VideoItem;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 
 public class AppServer implements AppServerApi {
     private static final String TAG = "AppServer";
-    
+
     private static final String ACCOUNT = "small-video";
 
     @Override
-    public void getFeedStreamWithPlayAuthToken(final int VideoType, ServerResultCallback callback) {
+    public void getFeedStreamWithPlayAuthToken(ServerResultCallback callback) {
         Request.GetFeedStreamRequest request = new Request.GetFeedStreamRequest(
                 ACCOUNT, 0, 100);
 
@@ -39,8 +41,7 @@ public class AppServer implements AppServerApi {
                 new Callback<Response.GetFeedStreamResponse>() {
                     @Override
                     public void onResponse(final Call<Response.GetFeedStreamResponse> call,
-                            @NotNull
-                            final retrofit2.Response<Response.GetFeedStreamResponse> response) {
+                                           @NotNull final retrofit2.Response<Response.GetFeedStreamResponse> response) {
                         Response.GetFeedStreamResponse feedStreamResponse = response.body();
                         if (feedStreamResponse == null) {
                             callback.onResult(null);
@@ -57,7 +58,7 @@ public class AppServer implements AppServerApi {
 
                     @Override
                     public void onFailure(final Call<Response.GetFeedStreamResponse> call,
-                            final Throwable t) {
+                                          final Throwable t) {
                         callback.onResult(null);
                     }
                 });

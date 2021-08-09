@@ -19,9 +19,15 @@ package com.bytedance.volc.voddemo.videoview.layer;
 
 import android.content.Context;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+
+import com.bytedance.volc.voddemo.data.VideoItem;
+import com.bytedance.volc.voddemo.videoview.Transformer;
 import com.bytedance.volc.voddemo.videoview.VideoController;
 
 public interface ILayerHost {
+
+    RelativeLayout getLayerRootView();
 
     void addLayer(ILayer layer);
 
@@ -44,4 +50,14 @@ public interface ILayerHost {
     boolean isPaused();
 
     VideoController getVideoController();
+
+    long getDuration();
+
+    String getTitle();
+
+    VideoItem getVideoItem();
+
+    void setTransformer(final Transformer transformer);
+
+    Transformer getTransformer();
 }

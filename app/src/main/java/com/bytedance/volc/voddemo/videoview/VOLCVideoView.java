@@ -34,19 +34,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import com.bytedance.volc.voddemo.R;
-import com.bytedance.volc.voddemo.VodApp;
 import com.bytedance.volc.voddemo.data.VideoItem;
-import com.bytedance.volc.voddemo.preload.PreloadManager;
+import com.bytedance.volc.voddemo.videoview.layer.CommonLayerCommand;
 import com.bytedance.volc.voddemo.videoview.layer.CommonLayerEvent;
 import com.bytedance.volc.voddemo.videoview.layer.ILayer;
+import com.bytedance.volc.voddemo.videoview.layer.ILayerHost;
+import com.bytedance.volc.voddemo.videoview.layer.IVideoLayerCommand;
 import com.bytedance.volc.voddemo.videoview.layer.IVideoLayerEvent;
 import com.bytedance.volc.voddemo.videoview.layer.LayerRoot;
 import com.bytedance.volc.voddemo.utils.TimerTaskManager;
 import com.ss.ttvideoengine.utils.Error;
 import com.ss.ttvideoengine.utils.TTVideoEngineLog;
+import java.lang.ref.WeakReference;
 
 public class VOLCVideoView extends FrameLayout
-        implements VideoPlayListener, TimerTaskManager.TaskListener {
+        implements VideoPlayListener, TimerTaskManager.TaskListener,
+        LayerRoot.VideoViewCommandListener {
     private static final String TAG = "ByteVideoView";
 
     private TextureView mTextureView;
@@ -55,6 +58,9 @@ public class VOLCVideoView extends FrameLayout
     private final LayerRoot mLayerRoot;
     private final DisplayMode mDisplayMode = new DisplayMode();
     private TimerTaskManager mProgressManager;
+    private WeakReference<ViewGroup> mOriginParent;
+    private Transformer mTransformer;
+    private LayerRoot.VideoViewCommandListener mCommandListener;
 
     public VOLCVideoView(@NonNull Context context) {
         this(context, null);
@@ -119,16 +125,25 @@ public class VOLCVideoView extends FrameLayout
             }
         });
 
+        mLayerRoot.setOnClickListener(v -> {
+            notifyEvent(new CommonLayerEvent(IVideoLayerEvent.VIDEO_LAYER_EVENT_VIDEO_VIEW_CLICK));
+        });
+
         mDisplayMode.setContainerView(this);
         mDisplayMode.setDisplayView(mTextureView);
     }
 
     public void setVideoController(VideoController videoController) {
         mVideoController = videoController;
-
+        mVideoController.setVideoPlayListener(this);
         if (mLayerRoot != null) {
             mLayerRoot.setVideoController(mVideoController);
+            mLayerRoot.setCommandListener(this);
         }
+    }
+
+    public VideoController getVideoController() {
+        return mVideoController;
     }
 
     public void play() {
@@ -319,6 +334,59 @@ public class VOLCVideoView extends FrameLayout
             onProgressUpdate(position, duration);
         }
         return 500;
+    }
+
+    @Override
+    public boolean onVideoViewCommand(final ILayerHost layerHost, final IVideoLayerCommand action) {
+        switch (action.getCommand()) {
+            case IVideoLayerCommand.VIDEO_HOST_CMD_ENTER_FULLSCREEN:
+                if (mTransformer != null) {
+                    mTransformer.enterFullScreen(this);
+                }
+                return true;
+            case IVideoLayerCommand.VIDEO_HOST_CMD_EXIT_FULLSCREEN:
+                if (mTransformer != null) {
+                    mTransformer.exitFullScreen(this);
+                }
+                return true;
+            default:
+                break;
+        }
+
+        if (mCommandListener == null) {
+            return false;
+        }
+
+        return mCommandListener.onVideoViewCommand(layerHost, action);
+    }
+
+    public void exitFullScreen() {
+        if (mLayerRoot != null) {
+            mLayerRoot.execCommand(
+                    new CommonLayerCommand(IVideoLayerCommand.VIDEO_HOST_CMD_EXIT_FULLSCREEN));
+        }
+    }
+
+    public void setCommandListener(LayerRoot.VideoViewCommandListener commandListener) {
+        mCommandListener = commandListener;
+    }
+
+    public void setParentLayout(ViewGroup parent) {
+        this.mOriginParent = new WeakReference<>(parent);
+    }
+
+    public ViewGroup getOriginParentLayout() {
+        if (mOriginParent != null) {
+            return mOriginParent.get();
+        }
+        return null;
+    }
+
+    public void setTransformer(Transformer transformer) {
+        mTransformer = transformer;
+        if (mLayerRoot != null) {
+            mLayerRoot.setTransformer(transformer);
+        }
     }
 
     private void onProgressUpdate(final int position, final int duration) {

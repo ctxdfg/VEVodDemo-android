@@ -20,6 +20,7 @@ package com.bytedance.volc.voddemo.data;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
+import androidx.lifecycle.LiveData;
 import com.bytedance.volc.voddemo.data.local.VideoItemDao;
 import com.bytedance.volc.voddemo.data.local.VodDataBaseManager;
 import com.bytedance.volc.voddemo.data.remote.AppServer;
@@ -45,12 +46,11 @@ public class VideoItemRepository {
         mMainHandler = new Handler(Looper.getMainLooper());
     }
 
-    public void getVideoList(final int type, final int limit,
-            ServerResultCallback resultCallback) {
-        mAppServerApi.getFeedStreamWithPlayAuthToken(type, videoItems -> {
+    public void getVideoList(final int limit, ServerResultCallback resultCallback) {
+        mAppServerApi.getFeedStreamWithPlayAuthToken(videoItems -> {
             if (videoItems == null) {
                 mExecutorService.execute(() -> {
-                    List<VideoItem> items = mVideoItemDao.getItems(type, limit);
+                    List<VideoItem> items = mVideoItemDao.getItems(limit);
                     mMainHandler.post(() -> resultCallback.onResult(items));
                 });
                 return;
@@ -59,5 +59,15 @@ public class VideoItemRepository {
             mExecutorService.execute(() -> mVideoItemDao.insertItems(videoItems));
             resultCallback.onResult(videoItems);
         });
+    }
+
+    public LiveData<List<VideoItem>> getVideoListLiveData(final int limit) {
+        mAppServerApi.getFeedStreamWithPlayAuthToken(videoItems -> {
+            if (videoItems != null) {
+                mExecutorService.execute(() -> mVideoItemDao.insertItems(videoItems));
+            }
+        });
+
+        return mVideoItemDao.getItemsLiveData(limit);
     }
 }

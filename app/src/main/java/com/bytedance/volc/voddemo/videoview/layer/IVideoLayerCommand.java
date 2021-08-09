@@ -24,6 +24,11 @@ public interface IVideoLayerCommand {
     int VIDEO_HOST_CMD_REPLY = 102;
     int VIDEO_HOST_CMD_SEEK = 209;
 
+    int VIDEO_HOST_CMD_ENTER_FULLSCREEN = 300;
+    int VIDEO_HOST_CMD_EXIT_FULLSCREEN = 301;
+    int VIDEO_HOST_CMD_ENTER_DETAILS = 302;
+    int VIDEO_HOST_CMD_EXIT_DETAIL = 303;
+
     int getCommand();
 
     <T> T getParam(Class<T> clazz);

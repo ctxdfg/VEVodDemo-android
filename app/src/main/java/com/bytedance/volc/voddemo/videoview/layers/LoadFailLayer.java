@@ -22,15 +22,18 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+
 import com.bytedance.volc.voddemo.R;
+import com.bytedance.volc.voddemo.utils.UIUtils;
 import com.bytedance.volc.voddemo.videoview.layer.BaseVideoLayer;
 import com.bytedance.volc.voddemo.videoview.layer.CommonLayerCommand;
 import com.bytedance.volc.voddemo.videoview.layer.ILayer;
 import com.bytedance.volc.voddemo.videoview.layer.IVideoLayerCommand;
 import com.bytedance.volc.voddemo.videoview.layer.IVideoLayerEvent;
-import com.bytedance.volc.voddemo.utils.UIUtils;
 import com.ss.ttvideoengine.utils.Error;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,7 +46,8 @@ public class LoadFailLayer extends BaseVideoLayer {
     @NonNull
     @Override
     public List<Integer> getSupportEvents() {
-        return Arrays.asList(IVideoLayerEvent.VIDEO_LAYER_EVENT_PLAY_ERROR);
+        return Arrays.asList(IVideoLayerEvent.VIDEO_LAYER_EVENT_PLAY_START,
+                IVideoLayerEvent.VIDEO_LAYER_EVENT_PLAY_ERROR);
     }
 
     @Override

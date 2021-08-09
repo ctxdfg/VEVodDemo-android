@@ -24,7 +24,7 @@ import java.util.List;
 public interface PreloadStrategy {
     String TAG = "PreloadStrategy";
 
-    Resolution START_PLAY_RESOLUTION = Resolution.High;
+    Resolution START_PLAY_RESOLUTION = Resolution.Standard;
     long PRELOAD_SIZE = 300 * 1024;
 
     void videoListUpdate(List<VideoItem> videoItems);

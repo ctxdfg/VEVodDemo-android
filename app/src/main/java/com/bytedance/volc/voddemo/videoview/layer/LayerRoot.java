@@ -19,15 +19,19 @@ package com.bytedance.volc.voddemo.videoview.layer;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Pair;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
+import com.bytedance.volc.voddemo.data.VideoItem;
 import com.bytedance.volc.voddemo.utils.UIUtils;
+import com.bytedance.volc.voddemo.videoview.Transformer;
+import com.bytedance.volc.voddemo.videoview.VOLCVideoView;
 import com.bytedance.volc.voddemo.videoview.VideoController;
 import com.ss.ttvideoengine.utils.TTVideoEngineLog;
+
 import java.util.List;
 import java.util.TreeSet;
 
@@ -39,17 +43,16 @@ public class LayerRoot extends RelativeLayout implements ILayerHost {
     private final TreeSet<ILayer> mLayers = new TreeSet<>();
     private final SparseArray<TreeSet<ILayer>> mEventLayerMap = new SparseArray<>();
     private final SparseArray<View> mLayerViews = new SparseArray<>();
+    private VideoViewCommandListener mCommandListener;
+    private Transformer mTransformer;
 
     public LayerRoot(final Context context) {
         super(context);
     }
 
-    public LayerRoot(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public LayerRoot(final Context context, final AttributeSet attrs, final int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    @Override
+    public RelativeLayout getLayerRootView() {
+        return this;
     }
 
     @Override
@@ -59,38 +62,36 @@ public class LayerRoot extends RelativeLayout implements ILayerHost {
         }
         if (mLayerMap.get(layer.getZIndex()) != null) {
             TTVideoEngineLog.d(TAG, "layerType:" + layer.getZIndex()
-                                    + " already exist, remove the old before adding new one! "
-                                    + hashCode());
+                    + " already exist, remove the old before adding new one! "
+                    + hashCode());
             return;
         }
 
         TTVideoEngineLog.d(TAG, "add layer:" + layer.getClass().getSimpleName()
-                                + " layerType:" + layer.getZIndex() + " " + hashCode());
+                + " layerType:" + layer.getZIndex() + " " + hashCode());
         mLayerMap.put(layer.getZIndex(), layer);
         mLayers.add(layer);
 
         List<Integer> supportEvents = layer.getSupportEvents();
-        for (Integer eventType : supportEvents) {
-            if (mEventLayerMap.indexOfKey(eventType) >= 0) {
-                mEventLayerMap.get(eventType).add(layer);
-            } else {
-                TreeSet<ILayer> layers = new TreeSet<>();
-                layers.add(layer);
-                mEventLayerMap.put(eventType, layers);
+        if (supportEvents != null) {
+            for (Integer eventType : supportEvents) {
+                if (mEventLayerMap.indexOfKey(eventType) >= 0) {
+                    mEventLayerMap.get(eventType).add(layer);
+                } else {
+                    TreeSet<ILayer> layers = new TreeSet<>();
+                    layers.add(layer);
+                    mEventLayerMap.put(eventType, layers);
+                }
             }
         }
 
         layer.onRegister(this);
-        Pair<View, LayoutParams> pair = layer.onCreateView(getContext(),
-                LayoutInflater.from(getContext()));
+        View layerView = layer.onCreateView(getContext(),
+                LayoutInflater.from(getContext()), this);
         int position = findPositionForLayer(layer, this);
 
-        mLayerViews.put(layer.getZIndex(), pair.first);
-        if (pair.second != null) {
-            addView(pair.first, position, pair.second);
-        } else {
-            addView(pair.first, position);
-        }
+        mLayerViews.put(layer.getZIndex(), layerView);
+        addView(layerView, position);
     }
 
     @Override
@@ -102,7 +103,7 @@ public class LayerRoot extends RelativeLayout implements ILayerHost {
             return;
         }
         TTVideoEngineLog.d(TAG, "removeLayer:" + layer.getClass().getSimpleName()
-                                + " layerType:" + layer.getZIndex());
+                + " layerType:" + layer.getZIndex());
         mLayerMap.delete(layer.getZIndex());
         mLayers.remove(layer);
         for (int i = 0; i < mEventLayerMap.size(); i++) {
@@ -202,6 +203,12 @@ public class LayerRoot extends RelativeLayout implements ILayerHost {
 
     @Override
     public void execCommand(final IVideoLayerCommand command) {
+        if (mCommandListener != null) {
+            if (mCommandListener.onVideoViewCommand(this, command)) {
+                return;
+            }
+        }
+
         switch (command.getCommand()) {
             case IVideoLayerCommand.VIDEO_HOST_CMD_REPLY:
             case IVideoLayerCommand.VIDEO_HOST_CMD_PLAY:
@@ -242,5 +249,46 @@ public class LayerRoot extends RelativeLayout implements ILayerHost {
     @Override
     public VideoController getVideoController() {
         return mVideoController;
+    }
+
+    @Override
+    public long getDuration() {
+        if (mVideoController == null) {
+            return 0;
+        }
+        return mVideoController.getDuration();
+    }
+
+    @Override
+    public String getTitle() {
+        if (mVideoController == null) {
+            return null;
+        }
+        return mVideoController.getTitle();
+    }
+
+    @Override
+    public VideoItem getVideoItem() {
+        if (mVideoController == null) {
+            return null;
+        }
+        return mVideoController.getVideoItem();
+    }
+
+    public void setCommandListener(VideoViewCommandListener commandListener) {
+        this.mCommandListener = commandListener;
+    }
+
+    public void setTransformer(final Transformer transformer) {
+        mTransformer = transformer;
+    }
+
+    @Override
+    public Transformer getTransformer() {
+        return mTransformer;
+    }
+
+    public interface VideoViewCommandListener {
+        boolean onVideoViewCommand(ILayerHost layerHost, IVideoLayerCommand action);
     }
 }

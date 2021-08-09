@@ -17,6 +17,7 @@
  */
 package com.bytedance.volc.voddemo.data.local;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -26,8 +27,11 @@ import java.util.List;
 
 @Dao
 public interface VideoItemDao {
-    @Query("SELECT * FROM video_item WHERE type = :type LIMIT :limit")
-    List<VideoItem> getItems(int type, int limit);
+    @Query("SELECT * FROM video_item LIMIT :limit")
+    List<VideoItem> getItems(int limit);
+
+    @Query("SELECT * FROM video_item LIMIT :limit")
+    LiveData<List<VideoItem>> getItemsLiveData(int limit);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertItems(List<VideoItem> items);

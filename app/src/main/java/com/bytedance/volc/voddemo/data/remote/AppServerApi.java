@@ -18,5 +18,5 @@
 package com.bytedance.volc.voddemo.data.remote;
 
 public interface AppServerApi {
-    void getFeedStreamWithPlayAuthToken(int VideoType, ServerResultCallback serverResultCallback);
+    void getFeedStreamWithPlayAuthToken(ServerResultCallback serverResultCallback);
 }

@@ -19,13 +19,28 @@ package com.bytedance.volc.voddemo.home;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Fix reopen app from launcher, app restart instead resume
+        // https://stackoverflow.com/questions/19545889/app-restarts-rather-than-resumes
+        if (!isTaskRoot()) {
+            Intent intent = getIntent();
+            if (intent != null
+                    && intent.hasCategory(Intent.CATEGORY_LAUNCHER)
+                    && Intent.ACTION_MAIN.equals(intent.getAction())) {
+                finish();
+                return;
+            }
+        }
+
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }

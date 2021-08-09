@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!-- Picture in Picture Mode Permission -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+
     <application
             android:name=".VodApp"
             android:allowBackup="false"
@@ -50,5 +54,12 @@
         <activity
                 android:name=".settings.SettingActivity"
                 android:theme="@style/AppNoActionbar"/>
+
+        <activity
+            android:name=".longvideo.DetailActivity"
+            android:configChanges="screenSize|orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppNoActionbar" />
+
     </application>
 </manifest>

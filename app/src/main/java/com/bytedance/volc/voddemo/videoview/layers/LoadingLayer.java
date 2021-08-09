@@ -55,8 +55,8 @@ public class LoadingLayer extends BaseVideoLayer implements WeakHandler.IHandler
     private final WeakHandler mWeakHandler = new WeakHandler(this);
 
     @Override
-    public Pair<View, RelativeLayout.LayoutParams> onCreateView(@NonNull final Context context,
-            @NonNull final LayoutInflater inflater) {
+    public View onCreateView(@NonNull final Context context,
+            @NonNull final LayoutInflater inflater, RelativeLayout parent) {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
@@ -67,7 +67,8 @@ public class LoadingLayer extends BaseVideoLayer implements WeakHandler.IHandler
                 ContextCompat.getDrawable(context, R.drawable.loading));
         mLoading.setIndeterminate(true);
         UIUtils.setViewVisibility(mLoadingView, View.GONE);
-        return Pair.create(mLoadingView, params);
+        mLoadingView.setLayoutParams(params);
+        return mLoadingView;
     }
 
     @Override

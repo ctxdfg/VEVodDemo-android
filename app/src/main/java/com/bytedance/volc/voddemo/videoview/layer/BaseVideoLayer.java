@@ -18,12 +18,15 @@
 package com.bytedance.volc.voddemo.videoview.layer;
 
 import android.content.Context;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
 import androidx.annotation.NonNull;
+
+import com.bytedance.volc.voddemo.videoview.VOLCVideoView;
+
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseVideoLayer implements ILayer {
@@ -46,23 +49,25 @@ public abstract class BaseVideoLayer implements ILayer {
     }
 
     @Override
-    public Pair<View, RelativeLayout.LayoutParams> onCreateView(@NonNull Context context, @NonNull
-            LayoutInflater inflater) {
+    public View onCreateView(@NonNull Context context, @NonNull
+            LayoutInflater inflater, RelativeLayout parent) {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         mContext = context;
         if (mLayerView == null) {
             mLayerView = getLayerView(context, inflater);
             if (mLayerView != null) {
+                mLayerView.setLayoutParams(params);
                 setupViews();
             }
         }
-
         refresh();
-        return new Pair<>(mLayerView, params);
+        return mLayerView;
     }
 
-    protected abstract View getLayerView(final Context context, @NonNull LayoutInflater inflater);
+    protected View getLayerView(final Context context, @NonNull LayoutInflater inflater) {
+        return null;
+    }
 
     @Override
     public void refresh() {

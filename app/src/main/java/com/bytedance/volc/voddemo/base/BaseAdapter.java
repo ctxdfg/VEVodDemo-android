@@ -18,17 +18,15 @@
 package com.bytedance.volc.voddemo.base;
 
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.ViewHolder> {
-    private final List<T> mDatas = new ArrayList();
+public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.ViewHolder<T>> {
+    private final List<T> mDatas = new ArrayList<>();
 
     public BaseAdapter(List<T> datas) {
         if (datas != null) {
@@ -36,21 +34,9 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.Vi
         }
     }
 
-    public abstract int getLayoutId(int viewType);
-
-    public abstract void onBindViewHolder(ViewHolder holder, T data, int position);
-
-    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(getLayoutId(viewType), parent, false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        onBindViewHolder(holder, mDatas.get(position), position);
+    public void onBindViewHolder(@NonNull final ViewHolder<T> holder, final int position) {
+        holder.setupViews(position, mDatas.get(position));
     }
 
     @Override
@@ -86,7 +72,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.Vi
         return mDatas;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static abstract class ViewHolder<T> extends RecyclerView.ViewHolder {
         private final View mItemView;
         private final SparseArray<View> mViews = new SparseArray<>();
 
@@ -95,15 +81,16 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.Vi
             mItemView = itemView;
         }
 
-        public <T extends View> T getView(@IdRes int resourceId) {
+        public View getView(@IdRes int resourceId) {
             View view = mViews.get(resourceId);
             if (view == null) {
-                T t = mItemView.findViewById(resourceId);
-                mViews.put(resourceId, t);
-                view = t;
+                view = mItemView.findViewById(resourceId);
+                mViews.put(resourceId, view);
             }
-            return (T) view;
+            return view;
         }
+
+        public abstract void setupViews(final int position, T data);
     }
 }
 

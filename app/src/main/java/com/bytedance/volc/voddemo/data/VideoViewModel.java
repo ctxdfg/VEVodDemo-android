@@ -20,7 +20,9 @@ package com.bytedance.volc.voddemo.data;
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import com.bytedance.volc.voddemo.data.remote.ServerResultCallback;
+import java.util.List;
 
 public class VideoViewModel extends AndroidViewModel {
     private final VideoItemRepository mRepository;
@@ -30,7 +32,11 @@ public class VideoViewModel extends AndroidViewModel {
         mRepository = new VideoItemRepository(application);
     }
 
-    public void getVideoList(int type, int limit, ServerResultCallback resultCallback) {
-        mRepository.getVideoList(type, limit, resultCallback);
+    public void getVideoList(int limit, ServerResultCallback resultCallback) {
+        mRepository.getVideoList(limit, resultCallback);
+    }
+
+    public LiveData<List<VideoItem>> getVideoListLiveData(int limit) {
+       return mRepository.getVideoListLiveData(limit);
     }
 }

@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -29,7 +28,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bytedance.volc.voddemo.base.BaseAdapter;
-import com.bytedance.volc.voddemo.data.remote.ServerResultCallback;
 import com.bytedance.volc.voddemo.preload.PreloadManager;
 import com.bytedance.volc.voddemo.preload.SimplePreloadStrategy;
 import com.bytedance.volc.voddemo.videoview.layers.LoadFailLayer;
@@ -45,14 +43,14 @@ import com.bytedance.volc.voddemo.data.VideoViewModel;
 import com.bytedance.volc.voddemo.videoview.layers.CoverLayer;
 import com.bytedance.volc.voddemo.smallvideo.pager.PagerLayoutManager;
 import com.bytedance.volc.voddemo.smallvideo.pager.RecyclerViewPagerListener;
+import com.bytedance.volc.voddemo.videoview.pip.PipController;
 import com.ss.ttvideoengine.utils.TTVideoEngineLog;
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.bytedance.volc.voddemo.data.VideoItem.VIDEO_TYPE_SMALL;
 
 public class SmallVideoFragment extends Fragment implements RecyclerViewPagerListener {
-    private static final String TAG = "SmallFragment";
+    public static final String TAG = "SmallFragment";
 
     private static final int ITEMS_LIMIT = 100;
 
@@ -61,41 +59,23 @@ public class SmallVideoFragment extends Fragment implements RecyclerViewPagerLis
 
     private int mLastPosition = -1;
     private boolean mSelectFirst;
-    private RecyclerView mRecyclerView;
     private PagerLayoutManager mLayoutManager;
     private VideoViewModel mVideoViewModel;
 
     @Override
     public void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PipController.instance().dismiss();
         mVideoViewModel = new ViewModelProvider(this).get(VideoViewModel.class);
         PreloadManager.getInstance().setPreloadStrategy(new SimplePreloadStrategy());
         mAdapter = new BaseAdapter<VideoItem>(new ArrayList<>()) {
+            @NonNull
             @Override
-            public int getLayoutId(final int viewType) {
-                return R.layout.list_item_small_video;
-            }
-
-            @Override
-            public void onBindViewHolder(final ViewHolder holder, final VideoItem data,
-                    final int position) {
-                VOLCVideoView videoView = holder.getView(R.id.video_view);
-                videoView.setVideoController(new VOLCVideoController(videoView.getContext(), data,
-                        videoView));
-
-                videoView.setDisplayMode(DisplayMode.DISPLAY_MODE_ASPECT_FIT);
-
-                videoView.addLayer(new CoverLayer());
-                videoView.addLayer(new DebugLayer());
-                videoView.addLayer(new SmallToolbarLayer());
-                videoView.addLayer(new LoadFailLayer());
-                videoView.addLayer(new LoadingLayer());
-                videoView.refreshLayers();
-
-                if (!mSelectFirst) {
-                    mSelectFirst = true;
-                    onPageSelected(position, holder.itemView);
-                }
+            public ViewHolder<VideoItem> onCreateViewHolder(@NonNull final ViewGroup parent,
+                    final int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.list_item_small_video, parent, false);
+                return new SmallVideoViewHolder(view);
             }
         };
     }
@@ -111,14 +91,14 @@ public class SmallVideoFragment extends Fragment implements RecyclerViewPagerLis
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mRecyclerView = view.findViewById(R.id.recycler_view);
+        final RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         mLayoutManager = new PagerLayoutManager(requireContext(),
                 LinearLayoutManager.VERTICAL, false);
         mLayoutManager.setOnViewPagerListener(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setAdapter(mAdapter);
 
-        mVideoViewModel.getVideoList(VIDEO_TYPE_SMALL, ITEMS_LIMIT, videoItems -> {
+        mVideoViewModel.getVideoList(ITEMS_LIMIT, videoItems -> {
             if (videoItems != null && videoItems.size() > 0) {
                 mAdapter.addAll(videoItems);
                 PreloadManager.getInstance().videoListUpdate(videoItems);
@@ -193,5 +173,31 @@ public class SmallVideoFragment extends Fragment implements RecyclerViewPagerLis
         }
         mCurrentVideoView.release();
         mCurrentVideoView = null;
+    }
+
+    private class SmallVideoViewHolder extends BaseAdapter.ViewHolder<VideoItem> {
+        public SmallVideoViewHolder(@NonNull final View itemView) {
+            super(itemView);
+        }
+
+        @Override
+        public void setupViews(final int position, final VideoItem data) {
+            VOLCVideoView videoView = (VOLCVideoView) getView(R.id.video_view);
+            videoView.setVideoController(new VOLCVideoController(videoView.getContext(), data));
+
+            videoView.setDisplayMode(DisplayMode.DISPLAY_MODE_ASPECT_FIT);
+
+            videoView.addLayer(new CoverLayer());
+            videoView.addLayer(new DebugLayer());
+            videoView.addLayer(new SmallToolbarLayer());
+            videoView.addLayer(new LoadFailLayer());
+            videoView.addLayer(new LoadingLayer());
+            videoView.refreshLayers();
+
+            if (!mSelectFirst) {
+                mSelectFirst = true;
+                onPageSelected(position, itemView);
+            }
+        }
     }
 }

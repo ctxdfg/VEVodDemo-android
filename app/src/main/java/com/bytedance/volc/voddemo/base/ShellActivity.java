@@ -20,15 +20,19 @@ package com.bytedance.volc.voddemo.base;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
+import android.view.View;
 import androidx.fragment.app.Fragment;
 import com.bytedance.volc.voddemo.R;
+import com.bytedance.volc.voddemo.longvideo.DetailFragment;
+import com.bytedance.volc.voddemo.longvideo.LongVideoFragment;
 import com.bytedance.volc.voddemo.settings.SettingActivity;
 import com.bytedance.volc.voddemo.smallvideo.SmallVideoFragment;
+import com.bytedance.volc.voddemo.videoview.pip.PipController;
 
+import static com.bytedance.volc.voddemo.data.VideoItem.VIDEO_TYPE_LONG;
 import static com.bytedance.volc.voddemo.data.VideoItem.VIDEO_TYPE_SMALL;
 
-public class ShellActivity extends AppCompatActivity {
+public class ShellActivity extends TransActivity {
 
     final private static String ARG_VIDEO_TYPE = "pages_shell_activity_arg_video_type";
 
@@ -51,20 +55,40 @@ public class ShellActivity extends AppCompatActivity {
             mVideoType = bundle.getInt(ARG_VIDEO_TYPE);
         }
 
-        findViewById(R.id.iv_settings).setOnClickListener(v -> {
+        final View ivSettings = findViewById(R.id.iv_settings);
+        ivSettings.setOnClickListener(v -> {
             final Intent intent = new Intent(ShellActivity.this, SettingActivity.class);
             startActivity(intent);
         });
 
-        if (savedInstanceState == null) {
-            Fragment fragment = new SmallVideoFragment();
-            if (mVideoType == VIDEO_TYPE_SMALL) {
-                fragment = new SmallVideoFragment();
-            }
+        setFullScreenContainer(findViewById(android.R.id.content));
+        PipController.init(this);
 
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, fragment)
-                    .commitNow();
+        Fragment fragment;
+        if (mVideoType == VIDEO_TYPE_SMALL) {
+            ivSettings.setVisibility(View.VISIBLE);
+            fragment = getSupportFragmentManager().findFragmentByTag(SmallVideoFragment.TAG);
+            if (fragment != null) {
+                getSupportFragmentManager().beginTransaction().show(fragment).commit();
+            } else {
+                fragment = new SmallVideoFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.container, fragment, SmallVideoFragment.TAG)
+                        .commit();
+            }
+        } else if (mVideoType == VIDEO_TYPE_LONG) {
+            ivSettings.setVisibility(View.GONE);
+            fragment = getSupportFragmentManager().findFragmentByTag(LongVideoFragment.TAG);
+            if (fragment != null) {
+                getSupportFragmentManager().beginTransaction().show(fragment).commit();
+            } else {
+                fragment = LongVideoFragment.newInstance();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.container, fragment, LongVideoFragment.TAG)
+                        .commit();
+            }
+        } else {
+            finish();
         }
     }
 }
