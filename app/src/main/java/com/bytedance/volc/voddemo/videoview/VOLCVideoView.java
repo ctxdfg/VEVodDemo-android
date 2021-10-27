@@ -134,6 +134,10 @@ public class VOLCVideoView extends FrameLayout
     }
 
     public void setVideoController(VideoController videoController) {
+        TTVideoEngineLog.d(TAG, "setVideoController " + videoController + " " + videoController.getVideoItem());
+        if (mVideoController != null) {
+            mVideoController.setVideoPlayListener(null);
+        }
         mVideoController = videoController;
         mVideoController.setVideoPlayListener(this);
         if (mLayerRoot != null) {
@@ -166,6 +170,7 @@ public class VOLCVideoView extends FrameLayout
     }
 
     public void release() {
+        TTVideoEngineLog.d(TAG, "release");
         if (mProgressManager != null) {
             mProgressManager.release();
             mProgressManager = null;

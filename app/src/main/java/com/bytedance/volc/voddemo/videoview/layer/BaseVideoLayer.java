@@ -61,7 +61,6 @@ public abstract class BaseVideoLayer implements ILayer {
                 setupViews();
             }
         }
-        refresh();
         return mLayerView;
     }
 
