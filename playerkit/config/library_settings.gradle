@@ -1,0 +1,55 @@
+def rootDir = file("..")
+if (!gradle.ext.has('playerKitSettingsDir')) {
+    gradle.ext.playerKitSettingsDir = rootDir.getCanonicalPath()
+}
+def modulePrefix = ':'
+if (gradle.ext.has('playerKitModulePrefix')) {
+    modulePrefix += gradle.ext.playerKitModulePrefix
+}
+println("playerkit -> rootDir -> " + rootDir)
+println("playerkit -> modulePrefix -> " + modulePrefix)
+
+// flavors
+include modulePrefix + "flavor"
+project(modulePrefix + "flavor").projectDir = new File(rootDir, "flavor")
+
+include modulePrefix + "flavor:flavor-basic"
+project(modulePrefix + "flavor:flavor-basic").projectDir = new File(rootDir, "flavor/flavor-basic")
+
+include modulePrefix + "flavor:flavor-volc"
+project(modulePrefix + "flavor:flavor-volc").projectDir = new File(rootDir, "flavor/flavor-volc")
+
+include modulePrefix + "flavor:flavor-volc-ui"
+project(modulePrefix + "flavor:flavor-volc-ui").projectDir = new File(rootDir, "flavor/flavor-volc-ui")
+
+// ui
+include modulePrefix + "ui"
+project(modulePrefix + "ui").projectDir = new File(rootDir, "ui")
+
+include modulePrefix + "ui:player-ui"
+project(modulePrefix + "ui:player-ui").projectDir = new File(rootDir, "ui/player-ui")
+
+// library
+include modulePrefix + "library"
+project(modulePrefix + "library").projectDir = new File(rootDir, "library")
+
+include modulePrefix + "library:player-playback"
+project(modulePrefix + "library:player-playback").projectDir = new File(rootDir, "library/player-playback")
+
+include modulePrefix + "library:player-utils"
+project(modulePrefix + "library:player-utils").projectDir = new File(rootDir, "library/player-utils")
+
+include modulePrefix + "library:player"
+project(modulePrefix + "library:player").projectDir = new File(rootDir, "library/player")
+
+include modulePrefix + "library:player-settings"
+project(modulePrefix + "library:player-settings").projectDir = new File(rootDir, "library/player-settings")
+
+// core
+include modulePrefix + "core"
+project(modulePrefix + "core").projectDir = new File(rootDir, "core")
+
+include modulePrefix + "core:player-volcengine"
+project(modulePrefix + "core:player-volcengine").projectDir = new File(rootDir, "core/player-volcengine")
+
+

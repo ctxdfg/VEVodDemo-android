@@ -1,0 +1,11 @@
+apply plugin: 'com.android.library'
+apply from: "$gradle.ext.playerKitSettingsDir/config/library.gradle"
+
+dependencies {
+    api project(modulePrefix + 'core:player-volcengine')
+    api project(modulePrefix + 'ui:player-ui')
+    api project(modulePrefix + 'library:player')
+    api project(modulePrefix + 'library:player-playback')
+    api project(modulePrefix + 'library:player-settings')
+    api project(modulePrefix + 'library:player-utils')
+}

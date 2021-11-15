@@ -19,6 +19,7 @@ package com.bytedance.volc.voddemo.utils;
 
 import android.graphics.Rect;
 import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 

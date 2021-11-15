@@ -1,0 +1,18 @@
+apply plugin: 'com.android.library'
+apply from: "$gradle.ext.playerKitSettingsDir/config/library.gradle"
+
+dependencies {
+    testImplementation "junit:junit:${project.ext.junit}"
+    androidTestImplementation "androidx.test.ext:junit:${project.ext.androidxTestJunit}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${project.ext.androidxTestEspressoCore}"
+
+    implementation "androidx.appcompat:appcompat:${project.ext.androidxAppcompat}"
+
+    implementation "com.bytedanceapi:ttsdk-player_premium:${project.ext.bytedance.ttsdkVersion}"
+    implementation "com.bytedance.applog:RangersAppLog-Lite-cn:${project.ext.bytedance.applogVersion}"
+    implementation "com.squareup.okhttp3:okhttp:${project.ext.okhttp}"
+
+    implementation project(modulePrefix + 'library:player')
+    implementation project(modulePrefix + 'library:player-utils')
+    implementation project(modulePrefix + 'library:player-settings')
+}

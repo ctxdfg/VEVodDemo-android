@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="../../playerkit/library/player-ui/src/main/res/layout/simple_progress_layer.xml" value="0.34375" />
+        <entry key="../../playerkit/library/player-ui/src/main/res/layout/time_progress_bar_layer.xml" value="0.1828774062816616" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1915" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1915" />
+        <entry key="app/src/main/res/drawable/ic_long_video.xml" value="0.212" />
+        <entry key="app/src/main/res/drawable/ic_short_video.xml" value="0.212" />
+        <entry key="app/src/main/res/drawable/ic_small_video.xml" value="0.212" />
+        <entry key="app/src/main/res/drawable/splash_background.xml" value="0.1955" />
+        <entry key="app/src/main/res/layout/activity_home.xml" value="0.1875" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1875" />
+        <entry key="app/src/main/res/layout/activity_splash.xml" value="0.1875" />
+        <entry key="app/src/main/res/layout/activity_video_test.xml" value="0.18333333333333332" />
+        <entry key="app/src/main/res/layout/detail_video_fragment.xml" value="0.18333333333333332" />
+        <entry key="app/src/main/res/layout/main_fragment.xml" value="0.30117753623188404" />
+        <entry key="app/src/main/res/layout/main_fragment_item.xml" value="0.30117753623188404" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1915" />
+        <entry key="playerkit/ui/player-ui/src/main/res/layout/dialog_list_layer.xml" value="0.19300911854103345" />
+        <entry key="playerkit/ui/player-ui/src/main/res/layout/dialog_list_layer_item.xml" value="0.2857789855072464" />
+        <entry key="playerkit/ui/player-ui/src/main/res/layout/light_hint_layer.xml" value="0.2857789855072464" />
+        <entry key="playerkit/ui/player-ui/src/main/res/layout/loading_layer.xml" value="0.2857789855072464" />
+        <entry key="playerkit/ui/player-ui/src/main/res/layout/media_player_seekbar.xml" value="0.2857789855072464" />
+        <entry key="playerkit/ui/player-ui/src/main/res/layout/time_progress_bar_layer.xml" value="0.2857789855072464" />
+        <entry key="playerkit/ui/player-ui/src/main/res/layout/time_progress_bar_layer_interact_layout.xml" value="0.2857789855072464" />
+      </map>
+    </option>
+  </component>
   <component name="GoogleJavaFormatSettings">
     <option name="enabled" value="true" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

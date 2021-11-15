@@ -1,2 +1,5 @@
-include ':app'
 rootProject.name = "VEVodDemo-android"
+include ':app'
+
+gradle.ext.playerKitModulePrefix = 'playerkit:'
+apply from: new File(getRootDir(), 'playerkit/config/library_settings.gradle')
