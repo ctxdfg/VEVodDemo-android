@@ -10,8 +10,8 @@ Demo 中使用 `播放控件层 SDK` 实现了常见的三种播放场景：
 # 目录结构
 ```text
 |--VEVodDemo-android
-|--|--app           // Demo App 模块
-|--|--playerkit     // 火山引擎点播 SDK 播放控件层 SDK
+|--|--app                       // Demo App 模块
+|--|--playerkit                 // 火山引擎点播 SDK 播放控件层 SDK
 ```
 
 # 编译运行
@@ -35,7 +35,21 @@ cd VEVodDemo-android
 git checkout feature/playerkit/dev
 ```
 
-2. 在 settings.gradle 中引入 playerkit 模块
+2. 确保 project 根目录下的 build.gradle 文件中的 repositories 中配置了 mavenCentral() 和 火山引擎maven 服务。
+```groovy
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven {
+            url "https://artifact.bytedance.com/repository/Volcengine/" // volc public maven repo
+        }
+    }
+}
+```
+
+3. 在 settings.gradle 中引入 playerkit 模块
 ```groovy
 include ':app'
 
@@ -45,29 +59,55 @@ gradle.ext.playerKitModulePrefix = 'playerkit:'
 apply from: new File(getRootDir(), 'playerkit/config/library_settings.gradle')
 ```
 
-3. 在 App module 的 build.gradle 中引入 playerkit 依赖
+4. 在 App module 的 build.gradle 中引入 playerkit 依赖
 ```groovy
+android {
+   defaultConfig {
+      // APPLOG_SCHEME 为 AppLog SDK 必须参数，不填会编译不过
+      // 对于点播场景，填写 online 即可.
+      manifestPlaceholders.put("APPLOG_SCHEME", "online")
+   }
+}
 dependencies {
     implementation project(":${gradle.ext.playerKitModulePrefix}flavor:flavor-volc-ui")
 }
 ```
 
-4. sync 一下 gradle，完成集成.
-<img src="doc/res/image/img.png" width="200">
-   
+5. sync 一下 gradle，完成集成.
+   <img src="doc/res/image/img.png" width="200">
+
 ## PlayerKit 模块说明
+```text
+|--|--playerkit                 // 火山引擎点播 SDK 播放控件层 SDK
+|--|--|--config                 // 控件层 gradle 配置目录
+|--|--|--core
+|--|--|--|--player-volcengine   // 火山引擎播放器实现模块
+|--|--|--flavor
+|--|--|--|--flavor-basic        // 包含：播放器适配层
+|--|--|--|--flavor-volc         // 包含：播放器适配层 + 火山引擎播放器内核实现（player-volcengine）
+|--|--|--|--flavor-volc-ui      // 包含：播放器适配层 + 火山引擎播放器内核实现（player-volcengine） + 控件层内置的默认风格的业务 ui 模块（player-ui）
+|--|--|--library
+|--|--|--|--player              // 播放器适配层（定义了一套标准播放器接口）
+|--|--|--|--player-playback     // 播放流程控制模块
+|--|--|--|--player-settings     // 播放器 options 配置模块
+|--|--|--|--player-utils        // 工具类模块
+|--|--|--ui
+|--|--|--|--player-ui           // 控件层内置的默认风格的业务 ui 模块
+```
+
+
 | 模块 | 描述 |  |
 | ---- | ---- | ---- |
 | :ui:player-ui | 默认风格的业务 ui 模块 | 我们基于播放控件层 Layer 系统，参考西瓜/抖音播放界面风格实现了一些默认的 UI 来帮助业务快速集成。若默认风格不满足需求，可以随意修改源码。|
-| :core:player-volcengine | 火山引擎播放器适配模块  | 1. 用播件层的播放器接口，实现了火山引擎播放器.2. 封装了火山引擎播放器初始化模块，方便业务快速集成。火山引擎播放器 [官方文档](https://www.volcengine.com/docs/4/52) |
+| :core:player-volcengine | 火山引擎播放器实现模块  | 1. 用播件层的播放器接口，实现了火山引擎播放器.2. 封装了火山引擎播放器初始化模块，方便业务快速集成。火山引擎播放器 [官方文档](https://www.volcengine.com/docs/4/52) |
 | :library:player-settings | 播放器 options 配置模块 | 方便业务在 App 中调整播放器配置                              |
 | :library:player-playback | 播放流程控制模块 | 1. 封装了VideoView 和 VideoLayer，方便客户基于 VideoLayer 实现灵活/高复用的播放UI。2. 封装了 PlaybackController 把一次播放 Session 开始/结束时 Player/VideoView/MediaSource 的相互调用关系串起来。 |
-| :library:player | 播放器适配模块 | 定义了控件层播放器的标准接口，方便适配各种播放器。 |
+| :library:player | 播放器适配层模块 | 定义了控件层播放器的标准接口，方便适配各种播放器。 |
 | :library:player-util | 工具类模块 | 各模块需要的常见工具类如 logcat 输出等 |
 
 
 ## PlayerKit 快速开始
-下面用一个简单的例子快速展示 playerkit 的使用方式。完成后即可完成类似西瓜视频单个视频的播放界面，包含各种播放相关功能。 
+下面用一个简单的例子快速展示 playerkit 的使用方式。完成后即可完成类似西瓜视频单个视频的播放界面，包含各种播放相关功能。
 在完成 playerkit 的集成后，以下代码可以直接 copy 到工程中使用。
 
 <video width="720" height="1280" controls>
@@ -78,7 +118,7 @@ dependencies {
 > App.java
 ```java
 public class App extends Application {
-    
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -88,8 +128,8 @@ public class App extends Application {
         VolcPlayerInit.AppInfo appInfo = new VolcPlayerInit.AppInfo.Builder()
                 .setAppId("229234")
                 .setAppName("VOLCVodDemo")
-                .setAppRegion("VOLCVodDemoAndroid")
-                .setAppChannel("china")
+                .setAppRegion("china")
+                .setAppChannel("github_channel")
                 .setAppVersion(BuildConfig.VERSION_NAME)
                 .setLicenseUri("assets:///license2/volc_vod_demo_license2.lic")
                 .build();
@@ -130,10 +170,10 @@ public class SimpleVideoActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-        
+
         // 1. create VideoView instance
         videoView = findViewById(R.id.videoView);
-        
+
         // 2. create VideoLayerHost instance. Add Layers to VideoLayerHost.
         VideoLayerHost layerHost = new VideoLayerHost(this);
         layerHost.addLayer(new GestureLayer());
@@ -158,15 +198,15 @@ public class SimpleVideoActivity extends AppCompatActivity {
 
         // 3. attach VideoLayerHost to VideoView
         layerHost.attachToVideoView(videoView);
-        
+
         // 4. config VideoView
         videoView.selectDisplayView(DisplayView.DISPLAY_VIEW_TYPE_SURFACE_VIEW);
         videoView.setDisplayMode(DisplayModeHelper.DISPLAY_MODE_ASPECT_FIT);
-        
+
         // 5. create PlaybackController and bind VideoView
         PlaybackController controller = new PlaybackController();
         controller.bind(videoView);
-        
+
         // 6. create MediaSource and bind into VideoView
         MediaSource mediaSource = createQualitySelectionMediaSource();
         //MediaSource mediaSource = createSimpleMediaSource();
@@ -266,11 +306,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
-
-
-
-
-
-
-
-
