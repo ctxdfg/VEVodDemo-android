@@ -23,8 +23,8 @@ project.ext {
     okhttp = "4.9.3"
 
     bytedance = [
-            ttsdkVersion : "1.23.2.5",
-            applogVersion: "5.3.0"
+            ttsdkVersion : "1.25.1.9",
+            applogVersion: "6.7.0"
     ]
 
     modulePrefix = ':'
