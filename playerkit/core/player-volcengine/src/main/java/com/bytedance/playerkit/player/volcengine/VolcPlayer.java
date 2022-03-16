@@ -133,19 +133,16 @@ class VolcPlayer implements PlayerAdapter {
         player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_DASH, 1);
         player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_BASH, 1);
 
-        player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABEL_HARDWARE_DECODE,
+        player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_HARDWARE_DECODE,
                 VolcSettings.get().option(VolcSettings.PLAYER_OPTION_HARDWARE_DECODER).booleanValue() ? 1 : 0);
 
         String encoderType = VolcSettings.get().option(VolcSettings.PLAYER_OPTION_ENCODER_TYPE).stringValue();
         if (TextUtils.equals(encoderType, "h264")) {
-            player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_h265, 0);
-            player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_h266, 0);
+            player.setStringOption(TTVideoEngine.PLAYER_OPTION_STRING_SET_VIDEO_CODEC_TYPE, TTVideoEngine.CODEC_TYPE_H264);
         } else if (TextUtils.equals(encoderType, "h265")) {
-            player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_h265, 1);
-            player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_h266, 0);
+            player.setStringOption(TTVideoEngine.PLAYER_OPTION_STRING_SET_VIDEO_CODEC_TYPE, TTVideoEngine.CODEC_TYPE_h265);
         } else if (TextUtils.equals(encoderType, "h266")) {
-            player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_h265, 0);
-            player.setIntOption(TTVideoEngine.PLAYER_OPTION_ENABLE_h266, 1);
+            player.setStringOption(TTVideoEngine.PLAYER_OPTION_STRING_SET_VIDEO_CODEC_TYPE, TTVideoEngine.CODEC_TYPE_h266);
         }
         if (VolcSettings.get().option(VolcSettings.PLAYER_OPTION_OUTPUT_LOG).booleanValue()) {
             player.setIntOption(TTVideoEngine.PLAYER_OPTION_OUTPUT_LOG, 1);

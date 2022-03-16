@@ -2,10 +2,6 @@ apply plugin: 'com.android.library'
 apply from: "$gradle.ext.playerKitSettingsDir/config/library.gradle"
 
 dependencies {
-    testImplementation "junit:junit:${project.ext.junit}"
-    androidTestImplementation "androidx.test.ext:junit:${project.ext.androidxTestJunit}"
-    androidTestImplementation "androidx.test.espresso:espresso-core:${project.ext.androidxTestEspressoCore}"
-
     implementation "androidx.appcompat:appcompat:${project.ext.androidxAppcompat}"
     implementation "androidx.recyclerview:recyclerview:${project.ext.androidxRecyclerview}"
     implementation "com.google.code.gson:gson:${project.ext.gson}"

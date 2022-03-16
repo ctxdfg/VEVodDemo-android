@@ -26,3 +26,9 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+
+dependencies {
+    testImplementation "junit:junit:${project.ext.junit}"
+    androidTestImplementation "androidx.test.ext:junit:${project.ext.androidxTestJunit}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${project.ext.androidxTestEspressoCore}"
+}

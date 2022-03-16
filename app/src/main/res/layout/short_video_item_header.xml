@@ -17,21 +17,18 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp"
     tools:background="#CCCCCC">
 
-    <com.google.android.material.imageview.ShapeableImageView
+    <ImageView
         android:id="@+id/userAvatar"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_alignParentLeft="true"
-        android:background="#90CAF9"
-        app:shapeAppearanceOverlay="@style/CircleImage"
-        app:strokeColor="#90CAF9" />
+        android:background="@drawable/ic_avatar_bg" />
 
     <TextView
         android:id="@+id/userName"
