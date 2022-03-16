@@ -70,11 +70,19 @@ public class LongVideoFragment extends BaseFragment {
 
     @Override
     public boolean onBackPressed() {
-        if (isDetail()) {
-            // handled in detail
-            return true;
+        if (ENTER_DETAIL_ACTIVITY) {
+            return super.onBackPressed();
+        } else {
+            DetailVideoFragment detailVideoFragment = (DetailVideoFragment) requireActivity()
+                    .getSupportFragmentManager()
+                    .findFragmentByTag(DetailVideoFragment.class.getName());
+            if (detailVideoFragment != null) {
+                if (detailVideoFragment.onBackPressed()) {
+                    return true;
+                }
+            }
+            return super.onBackPressed();
         }
-        return super.onBackPressed();
     }
 
     @Override
@@ -121,7 +129,7 @@ public class LongVideoFragment extends BaseFragment {
         }
         DetailVideoFragment detailVideoFragment = (DetailVideoFragment) requireActivity()
                 .getSupportFragmentManager()
-                .findFragmentByTag(DetailVideoFragment.class.getSimpleName());
+                .findFragmentByTag(DetailVideoFragment.class.getName());
         return detailVideoFragment != null;
     }
 
