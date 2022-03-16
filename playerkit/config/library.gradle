@@ -1,5 +1,5 @@
 apply from: "$gradle.ext.playerKitSettingsDir/config/constants.gradle"
-apply from: "$gradle.ext.playerKitSettingsDir/config/publish.gradle"
+//apply from: "$gradle.ext.playerKitSettingsDir/config/publish.gradle"
 apply plugin: 'com.android.library'
 
 android {
