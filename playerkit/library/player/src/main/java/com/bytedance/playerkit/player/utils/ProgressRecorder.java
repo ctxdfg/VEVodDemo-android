@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ProgressRecoder {
+public class ProgressRecorder {
 
     private static final Map<String, Long> map = new HashMap<>();
 

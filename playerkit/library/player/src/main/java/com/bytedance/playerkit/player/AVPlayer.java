@@ -69,7 +69,7 @@ import com.bytedance.playerkit.player.legacy.PlayerLegacy;
 import com.bytedance.playerkit.player.source.MediaSource;
 import com.bytedance.playerkit.player.source.Track;
 import com.bytedance.playerkit.player.source.TrackSelector;
-import com.bytedance.playerkit.player.utils.ProgressRecoder;
+import com.bytedance.playerkit.player.utils.ProgressRecorder;
 import com.bytedance.playerkit.player.utils.ProgressTracker;
 import com.bytedance.playerkit.utils.Asserts;
 import com.bytedance.playerkit.utils.ExtraObject;
@@ -487,7 +487,7 @@ public class AVPlayer extends ExtraObject implements Player {
 
         // set start time inner
         if (mStartTime <= 0) {
-            long recordPosition = ProgressRecoder.getProgress(source.getSyncProgressId());
+            long recordPosition = ProgressRecorder.getProgress(source.getSyncProgressId());
             if (recordPosition > 0) {
                 L.d(this, "handleSourceSet", "restore start time", recordPosition);
                 mStartTime = recordPosition;
@@ -767,7 +767,7 @@ public class AVPlayer extends ExtraObject implements Player {
                 return mStartTime > 0 ? mStartTime : 0;
             case STATE_ERROR:
                 if (mMediaSource != null) {
-                    return ProgressRecoder.getProgress(mMediaSource.getSyncProgressId());
+                    return ProgressRecorder.getProgress(mMediaSource.getSyncProgressId());
                 } else {
                     return 0L;
                 }
@@ -988,12 +988,12 @@ public class AVPlayer extends ExtraObject implements Player {
             long position = getCurrentPosition();
             long duration = getDuration();
             if (position > 1000 && duration > 0 && position < duration - 1000) {
-                ProgressRecoder.recordProgress(mMediaSource.getSyncProgressId(), position);
+                ProgressRecorder.recordProgress(mMediaSource.getSyncProgressId(), position);
             }
         }
     }
 
     private void clearProgress() {
-        ProgressRecoder.removeProgress(mMediaSource.getSyncProgressId());
+        ProgressRecorder.removeProgress(mMediaSource.getSyncProgressId());
     }
 }
