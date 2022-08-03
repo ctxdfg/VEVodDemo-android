@@ -31,16 +31,16 @@ public class AppServer implements AppServerApi {
     private static final String ACCOUNT = "small-video";
 
     @Override
-    public void getFeedStreamWithPlayAuthToken(final int VideoType, ServerResultCallback callback) {
+    public void getFeedStreamWithPlayAuthToken(int VideoType, int pageIndex, int pageSize, ServerResultCallback callback) {
         Request.GetFeedStreamRequest request = new Request.GetFeedStreamRequest(
-                ACCOUNT, 0, 100);
+                ACCOUNT, pageIndex * pageSize, pageSize);
 
         AppServerManager.getInstance().getFeedStreamWithPlayAuthToken(request).enqueue(
                 new Callback<Response.GetFeedStreamResponse>() {
                     @Override
                     public void onResponse(final Call<Response.GetFeedStreamResponse> call,
-                            @NotNull
-                            final retrofit2.Response<Response.GetFeedStreamResponse> response) {
+                                           @NotNull
+                                           final retrofit2.Response<Response.GetFeedStreamResponse> response) {
                         Response.GetFeedStreamResponse feedStreamResponse = response.body();
                         if (feedStreamResponse == null) {
                             callback.onResult(null);
@@ -49,6 +49,11 @@ public class AppServer implements AppServerApi {
 
                         List<VideoItem> videoItems = new ArrayList<>();
                         List<Response.VideoDetail> videoDetails = feedStreamResponse.getResult();
+                        if (videoDetails == null) {
+                            callback.onResult(null);
+                            return;
+                        }
+
                         for (Response.VideoDetail videoDetail : videoDetails) {
                             videoItems.add(VideoItem.toVideoItem(videoDetail));
                         }
@@ -57,7 +62,7 @@ public class AppServer implements AppServerApi {
 
                     @Override
                     public void onFailure(final Call<Response.GetFeedStreamResponse> call,
-                            final Throwable t) {
+                                          final Throwable t) {
                         callback.onResult(null);
                     }
                 });

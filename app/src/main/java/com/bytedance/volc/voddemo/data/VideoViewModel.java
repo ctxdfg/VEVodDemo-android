@@ -30,7 +30,7 @@ public class VideoViewModel extends AndroidViewModel {
         mRepository = new VideoItemRepository(application);
     }
 
-    public void getVideoList(int type, int limit, ServerResultCallback resultCallback) {
-        mRepository.getVideoList(type, limit, resultCallback);
+    public void getVideoList(int type, int pageIndex, int pageSize, ServerResultCallback resultCallback) {
+        mRepository.getVideoList(type, pageIndex, pageSize, resultCallback);
     }
 }

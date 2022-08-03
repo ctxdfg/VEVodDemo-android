@@ -78,8 +78,15 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<BaseAdapter.Vi
     }
 
     public void addAll(List<T> datas) {
-        mDatas.addAll(datas);
-        notifyDataSetChanged();
+        if (datas != null) {
+            int count = mDatas.size();
+            mDatas.addAll(datas);
+            if (count > 0) {
+                notifyItemRangeInserted(count, mDatas.size());
+            } else {
+                notifyDataSetChanged();
+            }
+        }
     }
 
     public List<T> getAll() {

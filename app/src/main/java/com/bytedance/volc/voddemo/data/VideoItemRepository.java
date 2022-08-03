@@ -45,18 +45,19 @@ public class VideoItemRepository {
         mMainHandler = new Handler(Looper.getMainLooper());
     }
 
-    public void getVideoList(final int type, final int limit,
+    public void getVideoList(final int type, int pageIndex ,final int pageSize,
             ServerResultCallback resultCallback) {
-        mAppServerApi.getFeedStreamWithPlayAuthToken(type, videoItems -> {
-            if (videoItems == null) {
+        mAppServerApi.getFeedStreamWithPlayAuthToken(type, pageIndex, pageSize,videoItems -> {
+            if (videoItems == null && pageIndex == 0) {
                 mExecutorService.execute(() -> {
-                    List<VideoItem> items = mVideoItemDao.getItems(type, limit);
+                    List<VideoItem> items = mVideoItemDao.getItems(type, pageSize);
                     mMainHandler.post(() -> resultCallback.onResult(items));
                 });
                 return;
             }
-
-            mExecutorService.execute(() -> mVideoItemDao.insertItems(videoItems));
+            if (pageIndex == 0) {
+                mExecutorService.execute(() -> mVideoItemDao.insertItems(videoItems));
+            }
             resultCallback.onResult(videoItems);
         });
     }
